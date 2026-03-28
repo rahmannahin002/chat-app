@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 const chatSocket = require("./sockets/chatSocket");
 const Message = require("./models/Message");
 const onlineUsers = new Map(); // userId → socketId
+const path = require("path");
 
 dotenv.config();
 const connectDB = require("./config/db");
@@ -35,7 +36,7 @@ app.use("/api/users", require("./routes/users"));
 app.use("/api/messages", require("./routes/messages"));
 app.use("/uploads", express.static("uploads"));
 
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Test route
 app.get("/", (req, res) => {

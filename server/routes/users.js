@@ -24,7 +24,7 @@ router.post("/avatar", auth, upload.single("avatar"), async (req, res) => {
       { avatar: req.file.filename },
       { new: true }
     );
-    res.status(500).json({ message: "Upload success" });
+    res.status.json({ message: "Upload success" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Upload failed" });
@@ -39,7 +39,7 @@ router.delete("/avatar", auth, async (req, res) => {
       { avatar: "" },
       { new: true }
     );
-    res.status(500).json({ message: "Remove success" });
+    res.status.json({ message: "Remove success" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Remove failed" });
