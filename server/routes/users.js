@@ -7,7 +7,8 @@ const upload = require("../middleware/upload");
 // GET all users except current user
 router.get("/", auth, async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.user.id } }).select("-password");
+    //const users = await User.find({ _id: { $ne: req.user.id } }).select("-password");
+    const users = await User.find({ _id: { $ne: req.user.id } }).select("username avatar");
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch users" });
@@ -23,7 +24,7 @@ router.post("/avatar", auth, upload.single("avatar"), async (req, res) => {
       { avatar: req.file.filename },
       { new: true }
     );
-
+    res.status(500).json({ message: "Upload success" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Upload failed" });
@@ -38,7 +39,7 @@ router.delete("/avatar", auth, async (req, res) => {
       { avatar: "" },
       { new: true }
     );
-
+    res.status(500).json({ message: "Remove success" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Remove failed" });

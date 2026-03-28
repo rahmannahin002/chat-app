@@ -32,7 +32,7 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100dvh;
       background: var(--bg);
       display: flex;
       align-items: center;
@@ -224,7 +224,7 @@
       const password = document.getElementById("password").value;
 
       try {
-        const res = await fetch("http://localhost:5000/api/auth/register", {
+        const res = await fetch("https://chat-app-backend-spb6.onrender.com/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, email, password }),

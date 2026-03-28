@@ -9,10 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com" crossorigin="anonymous"></script>
 
   <!-- Socket.IO -->
-  <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+  <script src="https://chat-app-backend-spb6.onrender.com/socket.io/socket.io.js"></script>
 
   <style>
     :root {
@@ -38,9 +38,10 @@
     body {
       margin: 0;
       background: var(--bg-light);
-      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       transition: background 0.3s ease;
+      padding-top: env(safe-area-inset-top);
     }
 
     body.dark {
@@ -49,7 +50,7 @@
 
     .app {
       display: flex;
-      height: 100vh;
+      height: 100%;
       max-width: 1200px;
       margin: auto;
       background: var(--bg-white);
@@ -301,6 +302,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      -webkit-overflow-scrolling: touch;
     }
 
     .message {
@@ -772,14 +774,14 @@
       <div class="chat-input" id="chatInput">
         <input type="text" id="messageInput" placeholder="Type a message..." />
         <button class="send-btn" id="sendBtn">
-          <i class="fas fa-paper-plane"></i>
+          <i class="fa-solid fa-paper-plane">-></i>
         </button>
       </div>
     </div>
   </div>  
 
   <script>
-    const socket = io("http://localhost:5000");
+    const socket = io("https://chat-app-backend-spb6.onrender.com");
   
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
@@ -789,10 +791,11 @@
     }
 
     // Replace mock user with real one
-    const currentUser = {
-      id: user.id,
-      username: user.username
-    };
+    // const currentUser = {
+    //   id: user.id,
+    //   username: user.username
+    // };
+    const currentUser = JSON.parse(localStorage.getItem("user"));
 
     let typingTimeout;
 
@@ -800,7 +803,7 @@
 
     async function fetchUsers() {
       try {
-        const res = await fetch("http://localhost:5000/api/users", {
+        const res = await fetch("https://chat-app-backend-spb6.onrender.com/api/users", {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -851,7 +854,11 @@
         item.className = "chat-item";
         item.innerHTML = `
           <div class="chat-avatar">
-            ${user.name.charAt(0)}
+            ${
+              user.avatar
+                ? `<img src="https://chat-app-backend-spb6.onrender.com/uploads/${user.avatar}" />`
+                : user.name.charAt(0)
+            }
             <span class="status-dot ${user.online ? "online" : ""}"></span>
           </div>
           <div class="chat-details">
@@ -879,7 +886,8 @@
     chatHeader.style.display = "flex";
     chatAvatar.textContent = user.name.charAt(0);
     chatName.textContent = user.name;
-    chatStatus.textContent = "Online";
+    //chatStatus.textContent = "Online";
+    chatStatus.textContent = user.online ? "Online" : "Offline";
 
     chatMessages.innerHTML = "";
     emptyState.style.display = "none";
@@ -889,7 +897,7 @@
 
     // 🔥 Load messages from backend
     try {
-      const res = await fetch(`http://localhost:5000/api/messages/${user.id}`, {
+      const res = await fetch(`https://chat-app-backend-spb6.onrender.com/api/messages/${user.id}`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -915,7 +923,7 @@
       const avatarEl = document.getElementById("profileAvatar");
 
       if (user.avatar) {
-        avatarEl.innerHTML = `<img src="http://localhost:5000/uploads/${user.avatar}" />`;
+        avatarEl.innerHTML = `<img src="https://chat-app-backend-spb6.onrender.com/uploads/${user.avatar}" />`;
       } else {
         avatarEl.textContent = user.username.charAt(0);
       }
@@ -948,7 +956,7 @@
       const formData = new FormData();
       formData.append("avatar", file);
 
-      const res = await fetch("http://localhost:5000/api/users/avatar", {
+      const res = await fetch("https://chat-app-backend-spb6.onrender.com/api/users/avatar", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -964,7 +972,7 @@
 
 
     document.getElementById("removeAvatar").onclick = async () => {
-      await fetch("http://localhost:5000/api/users/avatar", {
+      await fetch("https://chat-app-backend-spb6.onrender.com/api/users/avatar", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
@@ -1018,6 +1026,13 @@
     user.online = onlineUserIds.includes(user.id);
     });
       renderUserList(); // re-render with updated status
+      if (selectedUser) {
+        const updated = users.find(u => u.id === selectedUser.id);
+        if (updated) {
+          selectedUser.online = updated.online;
+          chatStatus.textContent = updated.online ? "Online" : "Offline";
+        }
+      }
     });
 
 
